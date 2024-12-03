@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>What Kind of Coder Are You?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Roboto Mono', monospace;
+            background: linear-gradient(135deg, #121212, #333333);
+            color: #ffc600;
+        }
+        .quiz-container {
+            width: 600px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 198, 0, 0.3);
+            position: relative;
+            z-index: 10;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid #ffc600;
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffc600;
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 198, 0, 0.5);
+        }
+        .question {
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            color: #ffc600;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        button {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            padding: 15px;
+            background-color: rgba(255, 198, 0, 0.1);
+            color: #ffc600;
+            border: 2px solid #ffc600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 198, 0, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+        button:hover::before {
+            left: 100%;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 198, 0, 0.5);
+        }
+        #result {
+            margin-top: 30px;
+            font-size: 1.5rem;
+            color: #ffc600;
+            line-height: 1.6;
+        }
+        .progress {
+            width: 100%;
+            height: 10px;
+            background-color: rgba(255, 198, 0, 0.2);
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            width: 0;
+            height: 100%;
+            background-color: #ffc600;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Coder Personality Quiz</h1>
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+        <div id="quiz">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const quizData = {
+            questions: [
+                {
+                    text: "When faced with a coding problem, you typically:",
+                    options: [
+                        { text: "Research existing solutions thoroughly", coder: "Researcher" },
+                        { text: "Dive in and start coding immediately", coder: "Adventurer" },
+                        { text: "Create a detailed plan before writing a single line", coder: "Architect" },
+                        { text: "Ask colleagues for their approach", coder: "Collaborator" }
+                    ]
+                },
+                {
+                    text: "Your favorite programming language is:",
+                    options: [
+                        { text: "Python - versatile and readable", coder: "Researcher" },
+                        { text: "Rust - performance and safety", coder: "Architect" },
+                        { text: "JavaScript - flexible and dynamic", coder: "Adventurer" },
+                        { text: "TypeScript - structured and predictable", coder: "Collaborator" }
+                    ]
+                },
+                {
+                    text: "In a team project, you're most likely to:",
+                    options: [
+                        { text: "Write comprehensive documentation", coder: "Researcher" },
+                        { text: "Prototype new features quickly", coder: "Adventurer" },
+                        { text: "Design the overall system architecture", coder: "Architect" },
+                        { text: "Ensure smooth communication between team members", coder: "Collaborator" }
+                    ]
+                },
+                {
+                    text: "Your ideal coding environment is:",
+                    options: [
+                        { text: "A quiet space with multiple research resources", coder: "Researcher" },
+                        { text: "An open, collaborative workspace", coder: "Collaborator" },
+                        { text: "A minimalist setup with multiple monitors", coder: "Architect" },
+                        { text: "A dynamic, flexible workspace", coder: "Adventurer" }
+                    ]
+                },
+                {
+                    text: "When debugging, you prefer to:",
+                    options: [
+                        { text: "Use systematic debugging tools and techniques", coder: "Researcher" },
+                        { text: "Experiment with different solutions quickly", coder: "Adventurer" },
+                        { text: "Analyze the entire system for potential issues", coder: "Architect" },
+                        { text: "Collaborate and get input from team members", coder: "Collaborator" }
+                    ]
+                },
+                {
+                    text: "Your approach to learning new technologies is:",
+                    options: [
+                        { text: "Deep-dive into academic papers and official documentation", coder: "Researcher" },
+                        { text: "Build side projects to learn hands-on", coder: "Adventurer" },
+                        { text: "Create comprehensive learning roadmaps", coder: "Architect" },
+                        { text: "Join study groups and collaborative learning platforms", coder: "Collaborator" }
+                    ]
+                }
+            ],
+            results: {
+                "Researcher": {
+                    description: "The Research-Driven Coder 🔬\n\nYou approach coding with academic precision. Your strength lies in deep understanding, thorough research, and methodical problem-solving. You're the one who digs into documentation, understands the theory behind technologies, and develops solutions based on comprehensive knowledge."
+                },
+                "Adventurer": {
+                    description: "The Experimental Coder 🚀\n\nYou're a coding adventurer who learns by doing. Quick to prototype, unafraid of failure, and always eager to try new approaches. Your dynamic coding style means you're often the first to explore new technologies and find innovative solutions through hands-on experimentation."
+                },
+                "Architect": {
+                    description: "The Systems Architect 🏗️\n\nYou see code as a complex, interconnected system. Your strength is in designing elegant, scalable architectures. Before writing a single line of code, you've already mapped out the entire system in your mind, ensuring efficiency, maintainability, and future-proofing."
+                },
+                "Collaborator": {
+                    description: "The Team-Oriented Coder 🤝\n\nCommunication and teamwork are your superpowers. You excel at bridging gaps between team members, ensuring smooth project flow, and creating code that's not just functional, but also comprehensible and maintainable by your entire team."
+                }
+            }
+        };
+
+        let currentQuestion = 0;
+        let coderScores = {
+            "Researcher": 0,
+            "Adventurer": 0,
+            "Architect": 0,
+            "Collaborator": 0
+        };
+
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progress-bar');
+            const progress = ((currentQuestion + 1) / quizData.questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function displayQuestion() {
+            const questionEl = document.getElementById('question');
+            const optionsEl = document.getElementById('options');
+            const currentQuizQuestion = quizData.questions[currentQuestion];
+
+            questionEl.textContent = currentQuizQuestion.text;
+            optionsEl.innerHTML = '';
+
+            currentQuizQuestion.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.text;
+                button.addEventListener('click', () => selectAnswer(option.coder));
+                optionsEl.appendChild(button);
+            });
+
+            updateProgressBar();
+        }
+
+        function selectAnswer(coder) {
+            coderScores[coder]++;
+            currentQuestion++;
+
+            if (currentQuestion < quizData.questions.length) {
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const quizEl = document.getElementById('quiz');
+            const resultEl = document.getElementById('result');
+            quizEl.style.display = 'none';
+
+            const topCoder = Object.keys(coderScores).reduce((a, b) => 
+                coderScores[a] > coderScores[b] ? a : b
+            );
+
+            resultEl.textContent = quizData.results[topCoder].description;
+        }
+
+        // Start the quiz
+        displayQuestion();
+    </script>
+</body>
+</html>
